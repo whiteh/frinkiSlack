@@ -33,10 +33,14 @@ callback = function(response) {
 }
 
 function frinkiac(term, callback) {
-
+  if (term.length > 20) {
+    return;
+  }
+  term = encodeURIComponent(term);
+  //console.log(term)
   http.get({
       host: 'frinkiac.com',
-      path: '/api/search?q=rappin%27%20ronnie%20regan'},
+      path: '/api/search?q='+term},
            function(response){
               var body = "";
               response.on("data", function(d) {
@@ -45,21 +49,20 @@ function frinkiac(term, callback) {
 
               response.on("end", function(){
                 var json = JSON.parse(body);
-                console.log(body);
+                //console.log(body);
                 callback(json);
               })
-              });
+              }).end();
 }
 
 // give the bot something to listen for.
-controller.hears('hello',['direct_message','direct_mention','mention'],function(bot,message) {
-  /*http.request({
-      host: 'frinkiac.com',
-      path: '/api/search?q=rappin%27%20ronnie%20regan'}, callback).end("blah");*/
-  //bot.reply(message,'Hello yourself.');
-  frinkiac("", function(json){
-    bot.reply(message, "Hello Yourself "+
-              "https://frinkiac.com/img/"+json[0].Episode+"/"+json[0].Timestamp+".jpg");
+/*controller.hears('hello',['direct_message','direct_mention','mention'],function(bot,message) {*/
+controller.on('direct_message', function(bot, message) {
+  console.log(message);
+  frinkiac(message.text, function(json){
+    var rand;
+    rand = Math.pow(Math.random(), 2);
+    rand = Math.round(rand*(json.length));//>10 ? 10 : json.length));
+    bot.reply(message, "https://frinkiac.com/img/"+json[rand].Episode+"/"+json[rand].Timestamp+".jpg");
   })
-
 });
