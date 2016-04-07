@@ -2,6 +2,7 @@ var Botkit = require('botkit');
 var fs = require("fs");
 var params = {};
 var http = require("https");
+var loud = true;
 
 var API_KEY = fs.readFileSync("api_key", "utf8");
 
@@ -59,6 +60,19 @@ function frinkiac(term, callback) {
 /*controller.hears('hello',['direct_message','direct_mention','mention'],function(bot,message) {*/
 controller.on('direct_message', function(bot, message) {
   console.log(message);
+  if (message.text === "shut up") {
+    loud = false;
+    //bot.reply("Okay... :()");
+    return;
+  }
+  if (message.text === "go nuts") {
+    loud = true;
+    //bot.reply("Yeah!")
+    return;
+  }
+  if (!loud) {
+    return;
+  }
   frinkiac(message.text, function(json){
     var rand;
     rand = Math.pow(Math.random(), 2);
